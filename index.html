@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioLearning - Tema 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({ publicKey: "3LjnpLaDboHWv0VPY" });
+        })();
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .iframe-container { position: relative; width: 100%; height: 75vh; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .nav-btn { transition: all 0.3s ease; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .nav-btn.active { border-color: #10b981; color: #10b981; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .dot-pulse { animation: pulse-dot 1.2s infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="text-center lg:text-left">
+                    <h1 class="text-xl font-black text-emerald-600 tracking-tight">UNIDAD 1</h1>
+                    <p class="text-slate-500 font-bold text-xs uppercase">Tema 7.1:Elemento Discordante</p>
+                </div>
+               
+                <nav class="flex flex-wrap justify-center gap-1 md:gap-4">
+                    <button onclick="prepQuiz('deber', this)" class="nav-btn active px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>🧪</span> Deber
+                    </button>
+                    <button onclick="prepQuiz('evaluacion', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📝</span> Repaso
+                    </button>
+                    <button onclick="prepQuiz('extra', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📚</span> Práctica
+                    </button>
+                    <button onclick="prepQuiz('evaluacion_final', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📊</span> Evaluación
+                    </button>
+                    <button onclick="showSection('pdf', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📋</span> Pizarra
+                    </button>
+                    <button onclick="showSection('video', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>🎥</span> Video
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <main id="app" class="max-w-5xl mx-auto p-6">
+    </main>
+    <script>
+        const DRIVE_PDF_URL = "https://drive.google.com/file/d/1Ly4Z6vMpqNTylmxf-vjyRjxuJ2Yct4Cr/view?usp=sharing";
+        const DRIVE_VIDEO_URL = 	"https://drive.google.com/file/d/12LkdeKFLFYDq5lQM8Bj5Um_pJfiaEflf/view?usp=sharing";
+
+
+        // PRINCIPAL (Deber + Repaso) 30/10 preguntas
+
+        const quizData = [
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/nqDZJnrN/Captura-de-pantalla-2026-08-04-095709.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La analogía es el cambio de lado de las líneas, así como la parte pintada. <br> <img src="https://i.ibb.co/QFVPjJZb/Captura-de-pantalla-2026-09-05-094724.png" alt="Descripción de la imagen" width="400" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/b5R07tGT/Captura-de-pantalla-2026-08-04-100011.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La analogía indica que la figura girada 90° y cambia la figura. <br> <img src="https://i.ibb.co/Sw42JPBh/Captura-de-pantalla-2026-09-05-094818.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/QFdt2jmX/Captura-de-pantalla-2026-08-04-100247.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La analogía indica que el elemento gira 180°. <br> <img src="https://i.ibb.co/fz3wK7Lb/Captura-de-pantalla-2026-09-05-094935.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/9HHmKM9Q/Captura-de-pantalla-2026-08-04-100740.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la figura girada 90°. <br> <img src="https://i.ibb.co/nsQ5hrmp/Captura-de-pantalla-2026-09-05-095308.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/xKzhYYHt/Captura-de-pantalla-2026-08-04-101124.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La analogía indica que los elementos iguales se unen para formar una sola figura. <br> <img src="https://i.ibb.co/G3Fh8why/Captura-de-pantalla-2026-09-05-095536.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/fdcTMrSG/Captura-de-pantalla-2026-08-04-101614.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La analogía indica que la figura aumenta una línea y se pinta. <br> <img src="https://i.ibb.co/fzyDb1bP/Captura-de-pantalla-2026-09-05-095654.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/kghXMCcM/Captura-de-pantalla-2026-08-04-101907.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la figura gira 90°. <br> <img src="https://i.ibb.co/QjczJzXH/Captura-de-pantalla-2026-09-05-100406.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/FkbvG68b/Captura-de-pantalla-2026-08-04-102231.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que del primer conjunto sale solo la parte inicial. <br> <img src="https://i.ibb.co/XfVmxDjQ/Captura-de-pantalla-2026-09-05-100731.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/HL8gqfmy/Captura-de-pantalla-2026-08-04-102512.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que aumenta el número de líneas. <br> <img src="https://i.ibb.co/MDxTR7dL/Captura-de-pantalla-2026-09-05-101019.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/tM2LfqXD/Captura-de-pantalla-2026-08-04-102649.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que el punto se convierte en una línea. <br> <img src="https://i.ibb.co/WWGnrK2f/Captura-de-pantalla-2026-09-05-101218.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/kgLKvCPD/Captura-de-pantalla-2026-08-04-102917.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La analogía indica que los vértices de las figuras son un número. <br> <img src="https://i.ibb.co/s9ZwLzcK/Captura-de-pantalla-2026-09-05-101322.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/HLxwCn9x/Captura-de-pantalla-2026-08-04-103145.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: ['C', 'D'], explanation: 'La analogía indica que la parte rellena con líneas será el mismo relleno interno. <br> <img src="https://i.ibb.co/XZjTj18x/Captura-de-pantalla-2026-09-05-101644.png" alt="Descripción de la imagen" width="480" height="350">.', multi: 'ON', maxSelect: 2 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/Jj4P1Q3s/Captura-de-pantalla-2026-08-04-103656.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La analogía indica que la figura superior cambia de color y las líneas son curvas. <br> <img src="https://i.ibb.co/5hx0ZYqs/Captura-de-pantalla-2026-09-07-100025.png" alt="Descripción de la imagen" width="380" height="340">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/gB74kbw/Captura-de-pantalla-2026-08-04-104001.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La analogía indica que las líneas se separan pero no cambian su forma. <br> <img src="https://i.ibb.co/kV44kCCz/Captura-de-pantalla-2026-09-07-100423.png" alt="Descripción de la imagen" width="380" height="340">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/CTnj5Y0/Captura-de-pantalla-2026-08-04-104152.png" alt="Descripción de la imagen" width="380" height="340">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La analogía indica que la figura superior gira en sentido horario. <br> <img src="https://i.ibb.co/ccDYnjGP/Captura-de-pantalla-2026-09-07-100631.png" alt="Descripción de la imagen" width="380" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/kVh8pRYX/Captura-de-pantalla-2026-08-04-104511.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'La analogía indica que el elemento dentro de la figura se convierte en otra y se queda fuera, esto ahora está a la inversa. <br> <img src="https://i.ibb.co/twCHvmJZ/Captura-de-pantalla-2026-09-07-100930.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/v4HFrmvt/Captura-de-pantalla-2026-08-04-105221.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que la figura gira 90°. <br> <img src="https://i.ibb.co/sdZSZdqX/Captura-de-pantalla-2026-09-07-101158.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/yc6ss99Y/Captura-de-pantalla-2026-08-04-105458.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La analogía indica que las líneas se abren.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/sv9Y7CdV/Captura-de-pantalla-2026-08-04-105601.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La analogía indica que en la figura se elimina una parte del mismo. <br> <img src="https://i.ibb.co/vCcndyv3/Captura-de-pantalla-2026-09-07-102008.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/FbnMzwzV/Captura-de-pantalla-2026-08-04-110108.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la figura está girando. <br> <img src="https://i.ibb.co/RGdNTMN1/Captura-de-pantalla-2026-09-07-102414.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/wrZ0gq8y/Captura-de-pantalla-2026-08-04-111750.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que en la figura gira 90°. <br> <img src="https://i.ibb.co/xS3KkX1b/Captura-de-pantalla-2026-09-07-102746.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/LhJ9n22Y/Captura-de-pantalla-2026-08-04-112644.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que uno de los elementos gira para formar una figura. <br> <img src="https://i.ibb.co/jkVsBgCP/Captura-de-pantalla-2026-09-07-103111.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/qMw4KxqP/Captura-de-pantalla-2026-08-04-113226.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La analogía indica que en la figura crece y va a hacia la derecha. <br> <img src="https://i.ibb.co/QvTXms6Q/Captura-de-pantalla-2026-09-07-103322.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/ZpySCkPL/Captura-de-pantalla-2026-08-04-114055.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que se eliminan dos elementos de la figura.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/LD46g8T1/Captura-de-pantalla-2026-08-04-114339.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'La analogía indica que en la figura gira 180°. <br> <img src="https://i.ibb.co/QF1TQ7VY/Captura-de-pantalla-2026-09-07-104546.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/mrtbdb5Z/Captura-de-pantalla-2026-08-04-114459.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La analogía indica que la figura 3D se transforma en 2D. <br> <img src="https://i.ibb.co/LdLqsQTt/Captura-de-pantalla-2026-09-07-104916.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/gbZ6FXbh/Captura-de-pantalla-2026-08-04-114723.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La analogía indica que en la figura la línea superior cambia de posición. <br> <img src="https://i.ibb.co/27qMwQsC/Captura-de-pantalla-2026-09-07-105131.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/Hfd1t1sW/Captura-de-pantalla-2026-08-04-115059.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía que la figura con las mismas características, es decir la figura debe tener todos sus lados diferentes. <br> <img src="https://i.ibb.co/0RCRKLNB/Captura-de-pantalla-2026-09-07-105557.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/XkpsP60D/Captura-de-pantalla-2026-08-04-115434.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La analogía indica que en la figura gira 180°. <br> <img src="https://i.ibb.co/0y8jq3N7/Captura-de-pantalla-2026-09-07-110001.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/tpFc1k08/Captura-de-pantalla-2026-08-04-115640.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que el elemento se pinta por la mitad de la misma. <br> <img src="https://i.ibb.co/NdGNGWtT/Captura-de-pantalla-2026-09-07-110106.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+        ];
+
+
+        // Practica 20 preguntas
+
+        const quizDataExtra = [
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/rfHKjGs8/Captura-de-pantalla-2026-08-04-120044.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la figura gira 45°. <br> <img src="https://i.ibb.co/4ZPyzcWH/Captura-de-pantalla-2026-09-07-110711.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/7JxW5wy3/Captura-de-pantalla-2026-08-04-132956.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La analogía indica que se pinta el centro de la figura. <br> <img src="https://i.ibb.co/1fHknxnn/Captura-de-pantalla-2026-09-07-110928.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/nNDzr2b0/Captura-de-pantalla-2026-08-04-133132.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La analogía indica que la figura interna gira 90°, además debe estar sobre la línea del rectángulo. <br> <img src="https://i.ibb.co/PGzDgXK1/Captura-de-pantalla-2026-09-07-111322.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/TBv7YyPd/Captura-de-pantalla-2026-08-04-133258.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la línea punteada de la figura se convierte en dos líneas sólidas.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/8LfFtFH0/Captura-de-pantalla-2026-08-04-133413.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La analogía indica que el primer elemento une sus líneas para formar una figura diferente. <br> <img src="https://i.ibb.co/35D28JQY/Captura-de-pantalla-2026-09-07-112244.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/vCh2HXFt/Captura-de-pantalla-2026-08-04-133555.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La analogía indica que las partes del elemento se mueven para formar una figura completa. <br> <img src="https://i.ibb.co/YFCy8ssM/Captura-de-pantalla-2026-09-07-114643.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/sd0Xk2FM/Captura-de-pantalla-2026-08-04-133814.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que el primer elemento une sus líneas para formar una figura diferente. <br> <img src="https://i.ibb.co/v6qYyQH6/Captura-de-pantalla-2026-09-07-115017.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/twtF1q45/Captura-de-pantalla-2026-08-04-133944.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la figura gira 180° y se genera un efecto espejo. <br> <img src="https://i.ibb.co/8gW4hyw3/Captura-de-pantalla-2026-09-07-115135.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/RT9xVdKj/Captura-de-pantalla-2026-08-04-134120.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la línea del gráfico se mueve formando un ángulo, además que el cuadrado queda en la misma posición. <br> <img src="https://i.ibb.co/bjRQCN18/Captura-de-pantalla-2026-09-07-115423.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/qYm0Ngb5/Captura-de-pantalla-2026-08-04-134614.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La analogía indica que la figura no cambia. <br> <img src="https://i.ibb.co/6CRCLyx/Captura-de-pantalla-2026-09-07-115528.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/Vc4rbt9T/Captura-de-pantalla-2026-08-04-134952.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La analogía indica que las líneas verticales se convierten en diagonales, pero no cambian su forma. <br> <img src="https://i.ibb.co/Xf4qkV59/Captura-de-pantalla-2026-09-08-092424.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/V0kd74jJ/Captura-de-pantalla-2026-08-04-135220.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que la línea de la figura cambia a un ovalo. <br> <img src="https://i.ibb.co/N2tXFc5k/Captura-de-pantalla-2026-09-08-092844.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/hFpwpNgJ/Captura-de-pantalla-2026-08-04-135418.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica el cuadrado cambia por un rectángulo, además de que las puntas negras se introducen formando líneas inclinadas. <br> <img src="https://i.ibb.co/7thVBfw0/Captura-de-pantalla-2026-09-08-093427.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/8nJTx5zY/Captura-de-pantalla-2026-08-04-135639.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que el circulo de la figura cambia de posición. <br> <img src="https://i.ibb.co/LztT8rh1/Captura-de-pantalla-2026-09-08-093639.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/dwJzjb3h/Captura-de-pantalla-2026-08-04-135827.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La analogía indica la parte cortada baja una posición en sentido de las manecillas del reloj. <br> <img src="https://i.ibb.co/7NN9CGGb/Captura-de-pantalla-2026-09-08-093826.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/kgvmRR24/Captura-de-pantalla-2026-08-04-140039.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La analogía indica que la figura se descompone en líneas. <br> <img src="https://i.ibb.co/4RjhhQX3/Captura-de-pantalla-2026-09-08-094232.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/S495kk24/Captura-de-pantalla-2026-08-04-140150.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La analogía indica que la figura se divide por la mitad y se la pinta. <br> <img src="https://i.ibb.co/YBSs240d/Captura-de-pantalla-2026-09-08-094503.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/4ZncZq1M/Captura-de-pantalla-2026-08-04-140249.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'La analogía indica que las líneas de la figura cambian de posición para partir desde el centro. <br> <img src="https://i.ibb.co/tMqDk3LR/Captura-de-pantalla-2026-09-08-094654.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/ZrjFQTS/Captura-de-pantalla-2026-08-04-140406.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que la figura gira 180°. <br> <img src="https://i.ibb.co/qLVp07Km/Captura-de-pantalla-2026-09-08-094837.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la analogía según el patrón. <br> <img src="https://i.ibb.co/kgWSDFv7/Captura-de-pantalla-2026-08-04-140513.png" alt="Descripción de la imagen" width="400" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La analogía indica que los elementos se unen, es decir el de la derecha se incrusta en el izquierdo además de tener pintada una de las esquinas dentro. <br> <img src="https://i.ibb.co/fzNVgXc4/Captura-de-pantalla-2026-09-08-095050.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+        ];
+
+        // EVALUACIÓN (16 preguntas)
+
+        const quizDataEvaluacion = [
+            { question: 'Resuelva la siguiente analogía. <br> <img src="https://i.ibb.co/F4rRB13G/Captura-de-pantalla-2026-09-08-101040.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La figura externa se convierte en figura interna, por lo que el cuadrado debe estar dentro de otra figura. <br> <img src="https://i.ibb.co/wNv93sHm/Captura-de-pantalla-2026-09-08-101223.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía. <br> <img src="https://i.ibb.co/99nwnvYb/Captura-de-pantalla-2026-09-08-101338.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'El vértice de las líneas del interior de las figuras está hacia arriba y luego hacia abajo. <br> <img src="https://i.ibb.co/dZjBVTf/Captura-de-pantalla-2026-09-08-101510.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía. <br> <img src="https://i.ibb.co/kgwHHNWP/Captura-de-pantalla-2026-09-08-101645.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La figura da un giro de 90° horario y los colores se invierten. <br> <img src="https://i.ibb.co/1ffhSWDn/Captura-de-pantalla-2026-09-08-101800.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía. <br> <img src="https://i.ibb.co/jkwqDrvd/Captura-de-pantalla-2026-09-09-092602.png" alt="Descripción de la imagen" width="400" height="200">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La figura gira de forma antihoraria y los colores se invierten. <br> <img src="https://i.ibb.co/YTTLpBW3/Captura-de-pantalla-2026-09-08-102215.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/XZZXqdQr/Captura-de-pantalla-2026-09-09-093037.png" alt="Descripción de la imagen" width="450" height="280">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La cantidad de elementos representa un numero pero en una posición diferente. <br> <img src="https://i.ibb.co/N6ZG6MyH/Captura-de-pantalla-2026-09-09-093343.png" alt="Descripción de la imagen" width="450" height="280">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/LDwLHkYL/Captura-de-pantalla-2026-09-09-094841.png" alt="Descripción de la imagen" width="450" height="280">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La cantidad de círculos o líneas representa un numero en una posición diferente. <br> <img src="https://i.ibb.co/qYBSb5sz/Captura-de-pantalla-2026-09-09-095008.png" alt="Descripción de la imagen" width="450" height="280">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/HTCVDy88/Captura-de-pantalla-2026-09-09-095124.png" alt="Descripción de la imagen" width="450" height="280">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'Cada flecha forma n número pero con una ubicación diferente. <br> <img src="https://i.ibb.co/VcfzS6j2/Captura-de-pantalla-2026-09-09-095226.png" alt="Descripción de la imagen" width="450" height="280">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/RpSYgJ7q/Captura-de-pantalla-2026-09-09-095326.png" alt="Descripción de la imagen" width="450" height="300">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'El cuadrado pintado cambia de posición al centro de la figura además las líneas se duplican en la analogía. <br> <img src="https://i.ibb.co/84BWtBWv/Captura-de-pantalla-2026-09-09-095448.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/MDbwDLvC/Captura-de-pantalla-2026-09-09-095657.png" alt="Descripción de la imagen" width="400" height="200">', options: ['1', '2', '3', '4'], answer: '1', explanation: 'Las líneas punteadas se transforman en una línea sólida y aumenta una línea más, así mismo la figura exterior tiene línea sólida y se transforma a una línea punteada. <br> <img src="https://i.ibb.co/kV93FjTv/Captura-de-pantalla-2026-09-09-095923.png" alt="Descripción de la imagen" width="400" height="200">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/Q393pQF1/Captura-de-pantalla-2026-09-09-100222.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La figuras externas cambian de posición además de mantener las características según la posición, el elemento que este en la parte superior siempre tendrá otro elemento dentro. <br> <img src="https://i.ibb.co/bMX6J17W/Captura-de-pantalla-2026-09-09-100401.png" alt="Descripción de la imagen" width="480" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/yctSVd4r/Captura-de-pantalla-2026-09-09-100545.png" alt="Descripción de la imagen" width="480" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La figura  gira en sentido antihorario, por lo que el elemento 3 debe girar en el mismo sentido. <br> <img src="https://i.ibb.co/HfzvrN56/Captura-de-pantalla-2026-09-09-100659.png" alt="Descripción de la imagen" width="480" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/MkXbR10c/Captura-de-pantalla-2026-09-09-100800.png" alt="Descripción de la imagen" width="480" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'Las figuras pintadas cambian de posición en sentido de las manecillas del reloj. <br> <img src="https://i.ibb.co/V0d1NkNv/Captura-de-pantalla-2026-09-09-100922.png" alt="Descripción de la imagen" width="480" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/Hfxhp6ch/Captura-de-pantalla-2026-09-09-101049.png" alt="Descripción de la imagen" width="600" height="240">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'El elemento gira en sentido horario. <br> <img src="https://i.ibb.co/Kp5zC089/Captura-de-pantalla-2026-09-09-101248.png" alt="Descripción de la imagen" width="600" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/RG7TjQqL/Captura-de-pantalla-2026-09-09-101430.png" alt="Descripción de la imagen" width="420" height="350">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'Los elementos giran hacia la derecha. <br> <img src="https://i.ibb.co/xqn2Pq8H/Captura-de-pantalla-2026-09-09-101550.png" alt="Descripción de la imagen" width="420" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/JjwBmFCf/Captura-de-pantalla-2026-09-09-101725.png" alt="Descripción de la imagen" width="500" height="250">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La figura se divide a la mitad y una de ellas cambia de dirección. <br> <img src="https://i.ibb.co/HfwRK2w5/Captura-de-pantalla-2026-09-09-101857.png" alt="Descripción de la imagen" width="500" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Resuelva la siguiente analogía <br> <img src="https://i.ibb.co/m5QB1g03/Captura-de-pantalla-2026-09-09-102005.png" alt="Descripción de la imagen" width="500" height="250">', options: ['A', 'B', 'C'], answer: 'A', explanation: 'La analogía son figuras que se complementan. <br> <img src="https://i.ibb.co/35Q27zC9/Captura-de-pantalla-2026-09-09-102145.png" alt="Descripción de la imagen" width="500" height="250">', multi: 'OFF', maxSelect: 1 },
+        ];
+
+        let state = {
+            currentMode: 'deber',
+            view: 'quiz_home',
+            studentName: '',
+            studentEmail: '',
+            activeQuestions: [],
+            currentQuestion: 0,
+            score: 0,
+            selectedAnswer: null,
+            isAnswerCorrect: null,
+            emailStatus: null,
+            emailAnalysis: null,
+            emailAnalysisMsg: ''
+        };
+
+        const disposableDomains = [
+            'tempmail.com','temp-mail.org','guerrillamail.com','10minutemail.com','mailinator.com',
+            'yopmail.com','throwawaymail.com','fakeinbox.com','trashmail.com','getnada.com',
+            'maildrop.cc','dispostable.com','sharklasers.com','guerrillamailblock.com'
+        ];
+        const trustedProviders = [
+            'gmail.com','googlemail.com','hotmail.com','hotmail.es','hotmail.co.uk','outlook.com',
+            'outlook.es','live.com','msn.com','yahoo.com','yahoo.es','icloud.com','me.com',
+            'protonmail.com','proton.me','aol.com','zoho.com','gmx.com','mail.com'
+        ];
+
+        function isValidEmailFormat(email) {
+            const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+            return re.test(email) && email.length <= 254 && !email.includes('..') && !email.startsWith('.') && !email.endsWith('.');
+        }
+
+        function analyzeEmail(email) {
+            const lower = email.toLowerCase().trim();
+            if (!lower) {
+                return { valid: false, msg: 'Escribe un correo electrónico.' };
+            }
+            if (!isValidEmailFormat(lower)) {
+                return { valid: false, msg: 'Formato inválido. Revisa que tenga @ y un dominio correcto.' };
+            }
+            const domain = lower.split('@')[1];
+            if (!domain || domain.length < 3) {
+                return { valid: false, msg: 'Dominio incompleto o inválido.' };
+            }
+            if (disposableDomains.some(d => domain === d || domain.endsWith('.' + d))) {
+                return { valid: false, msg: 'Correo temporal / desechable detectado. Usa un correo real.' };
+            }
+            const isTrusted = trustedProviders.some(p => domain === p);
+            const hasGoodTld = /\.(com|es|net|org|edu|gov|mx|ar|co|uk|de|fr|it|pt|br|cl)$/i.test(domain);
+            if (!hasGoodTld && !isTrusted) {
+                return { valid: false, msg: 'Dominio poco común o sospechoso. Usa Gmail, Hotmail/Outlook, Yahoo, etc.' };
+            }
+            let analysisText = '';
+            if (domain.includes('hotmail') || domain.includes('outlook') || domain.includes('live.com') || domain.includes('msn.com')) {
+                analysisText = 'Análisis: proveedor Microsoft (Hotmail/Outlook) detectado · formato correcto · dominio legítimo';
+            } else if (domain.includes('gmail') || domain.includes('googlemail')) {
+                analysisText = 'Análisis: proveedor Google (Gmail) detectado · formato correcto · dominio legítimo';
+            } else if (isTrusted) {
+                analysisText = 'Análisis: proveedor conocido · formato correcto · dominio legítimo';
+            } else {
+                analysisText = 'Análisis: formato válido · dominio con TLD estándar · no se detectaron patrones de correo temporal';
+            }
+            return { valid: true, msg: analysisText };
+        }
+
+        function showSection(section, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const app = document.getElementById('app');
+            if (section === 'pdf') {
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">📄 Pizarra Virtual</h2><div class="iframe-container"><iframe src="${DRIVE_PDF_URL}" width="100%" height="100%"></iframe></div></div>`;
+            } else if (section === 'video') {
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">🎥 Video Clase</h2><div class="iframe-container"><iframe src="${DRIVE_VIDEO_URL}" width="100%" height="100%"></iframe></div></div>`;
+            }
+        }
+
+        function prepQuiz(mode, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+           
+            state = {
+                currentMode: mode,
+                view: 'quiz_home',
+                studentName: '',
+                studentEmail: '',
+                activeQuestions: [],
+                currentQuestion: 0,
+                score: 0,
+                selectedAnswer: null,
+                isAnswerCorrect: null,
+                emailStatus: null,
+                emailAnalysis: null,
+                emailAnalysisMsg: ''
+            };
+            render();
+        }
+
+        function startQuiz() {
+            if (state.currentMode === 'deber') {
+                // Práctica: 30 preguntas en orden
+                state.activeQuestions = [...quizData].slice(0, 30);
+            } else if (state.currentMode === 'evaluacion') {
+                // Repaso: 10 preguntas aleatorias
+                state.activeQuestions = [...quizData]
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 10);
+            } else if (state.currentMode === 'extra') {
+                // Deber: 20 preguntas en orden
+                state.activeQuestions = [...quizDataExtra].slice(0, 20);
+            } else if (state.currentMode === 'evaluacion_final') {
+                // Evaluación: 16 preguntas en orden
+                state.activeQuestions = [...quizDataEvaluacion];
+            }
+            state.view = 'name_input';
+            state.emailAnalysis = null;
+            state.emailAnalysisMsg = '';
+            render();
+        }
+
+        function onEmailInput() {
+            const e = document.getElementById('email-in');
+            if (!e) return;
+            const val = e.value.trim();
+            if (val.length < 5) {
+                state.emailAnalysis = null;
+                state.emailAnalysisMsg = '';
+                updateEmailUI();
+                return;
+            }
+            state.emailAnalysis = 'checking';
+            state.emailAnalysisMsg = 'Analizando correo…';
+            updateEmailUI();
+            clearTimeout(window._emailCheckTimer);
+            window._emailCheckTimer = setTimeout(() => {
+                const result = analyzeEmail(val);
+                state.emailAnalysis = result.valid ? 'valid' : 'invalid';
+                state.emailAnalysisMsg = result.msg;
+                updateEmailUI();
+            }, 600);
+        }
+
+        function updateEmailUI() {
+            const feedback = document.getElementById('email-feedback');
+            const analysis = document.getElementById('email-analysis');
+            const input = document.getElementById('email-in');
+            if (!feedback || !analysis || !input) return;
+            if (state.emailAnalysis === 'checking') {
+                feedback.innerHTML = `<span class="text-slate-500 text-sm flex items-center gap-2"><span class="dot-pulse">●</span> Verificando…</span>`;
+                analysis.innerHTML = `<p class="text-xs text-slate-400 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-red-400', 'border-emerald-400');
+                input.classList.add('border-slate-300');
+            } else if (state.emailAnalysis === 'invalid') {
+                feedback.innerHTML = `<span class="text-red-600 text-sm font-semibold">✗ Correo no válido o inexistente</span>`;
+                analysis.innerHTML = `<p class="text-xs text-red-500/80 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-emerald-400', 'border-slate-300');
+                input.classList.add('border-red-400');
+            } else if (state.emailAnalysis === 'valid') {
+                feedback.innerHTML = `<span class="text-emerald-600 text-sm font-semibold">✓ Correo aceptado</span>`;
+                analysis.innerHTML = `<p class="text-xs text-emerald-600/80 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-red-400', 'border-slate-300');
+                input.classList.add('border-emerald-400');
+            } else {
+                feedback.innerHTML = '';
+                analysis.innerHTML = '';
+                input.classList.remove('border-red-400', 'border-emerald-400');
+                input.classList.add('border-slate-300');
+            }
+        }
+
+        function validaDatos() {
+            const n = document.getElementById('name-in').value.trim();
+            const e = document.getElementById('email-in').value.trim();
+            if (n.length <= 2) {
+                alert("Ingresa nombre completo (mínimo 3 caracteres).");
+                return;
+            }
+            const result = analyzeEmail(e);
+            state.emailAnalysis = result.valid ? 'valid' : 'invalid';
+            state.emailAnalysisMsg = result.msg;
+            updateEmailUI();
+            if (!result.valid) return;
+            state.studentName = n;
+            state.studentEmail = e;
+            state.view = 'playing';
+            render();
+        }
+
+        // ---------- LÓGICA SINGLE + MULTI ----------
+        function isMultiQuestion(q) {
+            return q.multi === 'ON';
+        }
+
+        function arraysEqual(a, b) {
+            if (!Array.isArray(a) || !Array.isArray(b)) return false;
+            if (a.length !== b.length) return false;
+            const sa = [...a].sort();
+            const sb = [...b].sort();
+            return sa.every((v, i) => v === sb[i]);
+        }
+
+        function handleAnswer(option) {
+            if (state.isAnswerCorrect !== null) return;
+
+            const currentQ = state.activeQuestions[state.currentQuestion];
+
+            if (isMultiQuestion(currentQ)) {
+                let selected = Array.isArray(state.selectedAnswer) ? [...state.selectedAnswer] : [];
+                const idx = selected.indexOf(option);
+
+                if (idx > -1) {
+                    selected.splice(idx, 1);
+                } else {
+                    if (selected.length >= currentQ.maxSelect) return;
+                    selected.push(option);
+                }
+                state.selectedAnswer = selected;
+                render();
+            } else {
+                if (state.selectedAnswer !== null) return;
+                state.selectedAnswer = option;
+                state.isAnswerCorrect = (option === currentQ.answer);
+                if (state.isAnswerCorrect) state.score++;
+                render();
+                if (state.isAnswerCorrect) {
+                    setTimeout(() => nextQuestion(), 1000);
+                }
+            }
+        }
+
+        function checkMultiAnswer() {
+            if (state.isAnswerCorrect !== null) return;
+
+            const currentQ = state.activeQuestions[state.currentQuestion];
+            if (!isMultiQuestion(currentQ)) return;
+
+            const selected = Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [];
+            if (selected.length === 0) return;
+
+            const correctAnswers = Array.isArray(currentQ.answer) ? currentQ.answer : [currentQ.answer];
+            state.isAnswerCorrect = arraysEqual(selected, correctAnswers);
+
+            if (state.isAnswerCorrect) state.score++;
+            render();
+
+            if (state.isAnswerCorrect) {
+                setTimeout(() => nextQuestion(), 1000);
+            }
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion + 1 < state.activeQuestions.length) {
+                state.currentQuestion++;
+                state.selectedAnswer = null;
+                state.isAnswerCorrect = null;
+                render();
+            } else {
+                state.view = 'results';
+                render();
+                enviarCorreo();
+            }
+        }
+
+        function enviarCorreo() {
+            if (!state.studentEmail) return;
+            state.emailStatus = 'sending';
+            render();
+            const scorePerc = Math.round((state.score / state.activeQuestions.length) * 100);
+            const totalQ = state.activeQuestions.length;
+            let imageUrl = '';
+            let mensaje = '';
+            if (scorePerc >= 90) {
+                imageUrl = 'https://img.icons8.com/color/128/medal2.png';
+                mensaje = `¡Excelente trabajo, ${state.studentName}! Obtuviste un resultado sobresaliente.`;
+            } else if (scorePerc >= 70) {
+                imageUrl = 'https://img.icons8.com/color/128/diploma.png';
+                mensaje = `¡Muy bien, ${state.studentName}! Has aprobado con un buen resultado.`;
+            } else if (scorePerc >= 50) {
+                imageUrl = 'https://img.icons8.com/color/128/ok.png';
+                mensaje = `Buen esfuerzo, ${state.studentName}. Sigue practicando para mejorar.`;
+            } else {
+                imageUrl = 'https://img.icons8.com/color/128/error.png';
+                mensaje = `Ánimo, ${state.studentName}. Revisa el material y vuelve a intentarlo.`;
+            }
+            const params = {
+                to_name: state.studentName,
+                to_email: state.studentEmail,
+                score: scorePerc,
+                correct_answers: state.score,
+                total_questions: totalQ,
+                mode_name: state.currentMode.toUpperCase(),
+                image_url: imageUrl,
+                mensaje: mensaje,
+                fecha: new Date().toLocaleDateString('es-ES', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                })
+            };
+            emailjs.send("service_dhvsi72", "template_cy74x9h", params)
+                .then(() => {
+                    state.emailStatus = 'success';
+                    render();
+                })
+                .catch((err) => {
+                    console.error('Error EmailJS:', err);
+                    state.emailStatus = 'error';
+                    render();
+                });
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+           
+            let modeTitle = '';
+            let modeDesc = '';
+            if (state.currentMode === 'deber') {
+                modeTitle = '🧪 Deber';
+                modeDesc = 'Resuelve las 30 preguntas del banco en orden.';
+            } else if (state.currentMode === 'evaluacion') {
+                modeTitle = '📝 Repaso';
+                modeDesc = 'Prueba de 10 preguntas seleccionadas al azar.';
+            } else if (state.currentMode === 'extra') {
+                modeTitle = '📚 Práctica';
+                modeDesc = 'Resuelve las 20 preguntas de la Práctica.';
+            } else if (state.currentMode === 'evaluacion_final') {
+                modeTitle = '📊 Evaluación';
+                modeDesc = 'Resuelve las 16 preguntas de la Evaluación.';
+            }
+           
+            if (state.view === 'quiz_home') {
+                app.innerHTML = `
+                <div class="text-center py-16 animate-fade-in bg-white rounded-[3rem] shadow-xl border">
+                    <h2 class="text-4xl font-black text-slate-800 mb-2">${modeTitle}</h2>
+                    <p class="text-slate-500 mb-8 text-lg">${modeDesc}</p>
+                    <button onclick="startQuiz()" class="bg-emerald-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all">
+                        INICIAR
+                    </button>
+                </div>`;
+            }
+
+            if (state.view === 'name_input') {
+                app.innerHTML = `
+                <div class="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] shadow-2xl animate-fade-in">
+                    <h2 class="text-2xl font-black mb-6 text-center">Registro de Estudiante</h2>
+                    <input id="name-in" type="text" placeholder="Nombre y Apellido completo" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl mb-4 focus:border-emerald-500 outline-none">
+                   
+                    <div class="relative mb-1">
+                        <input id="email-in" type="email" placeholder="Correo para recibir nota (Gmail, Hotmail…)"
+                               class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:border-emerald-500 outline-none transition-colors"
+                               oninput="onEmailInput()" onblur="onEmailInput()">
+                    </div>
+                   
+                    <div id="email-feedback" class="min-h-[22px] mb-1"></div>
+                    <div id="email-analysis" class="mb-5"></div>
+                   
+                    <button onclick="validaDatos()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all">
+                        ENTRAR AL TEST
+                    </button>
+                    <p class="text-center text-[11px] text-slate-400 mt-4">Se verifica formato y se descartan correos temporales. No se envía nada hasta terminar el test.</p>
+                </div>`;
+                setTimeout(updateEmailUI, 50);
+            }
+
+            if (state.view === 'playing') {
+                const q = state.activeQuestions[state.currentQuestion];
+                const progress = ((state.currentQuestion + 1) / state.activeQuestions.length) * 100;
+                const multi = isMultiQuestion(q);
+                const selected = multi
+                    ? (Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [])
+                    : (state.selectedAnswer ? [state.selectedAnswer] : []);
+
+                const multiHint = multi
+                    ? `<p class="text-sm text-sky-600 font-semibold mb-4">
+                         Selección múltiple · elige ${q.maxSelect} respuesta${q.maxSelect > 1 ? 's' : ''}
+                         ${selected.length > 0 ? `(${selected.length}/${q.maxSelect})` : ''}
+                       </p>`
+                    : '';
+
+                app.innerHTML = `
+                <div class="animate-fade-in">
+                    <div class="flex justify-between items-center mb-6 px-4">
+                        <span class="font-black text-emerald-600">${state.currentQuestion + 1} / ${state.activeQuestions.length}</span>
+                        <div class="w-48 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full transition-all" style="width:${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl border">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2 leading-tight">${q.question}</h2>
+                        ${multiHint}
+                        <div class="grid gap-3">
+                            ${q.options.map(opt => {
+                                let style = "border-slate-100 bg-slate-50 hover:border-emerald-200";
+                                const isSelected = selected.includes(opt);
+
+                                if (state.isAnswerCorrect !== null) {
+                                    if (multi) {
+                                        const correctSet = Array.isArray(q.answer) ? q.answer : [q.answer];
+                                        if (correctSet.includes(opt) && isSelected) {
+                                            style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                        } else if (isSelected && !correctSet.includes(opt)) {
+                                            style = "border-red-500 bg-red-100 text-red-800";
+                                        } else if (correctSet.includes(opt) && !isSelected) {
+                                            style = "border-emerald-300 bg-emerald-50 text-emerald-700";
+                                        }
+                                    } else {
+                                        if (isSelected) {
+                                            style = state.isAnswerCorrect
+                                                ? "border-emerald-500 bg-emerald-100 text-emerald-800"
+                                                : "border-red-500 bg-red-100 text-red-800";
+                                        }
+                                    }
+                                } else if (isSelected) {
+                                    if (multi) {
+                                        style = "border-sky-400 bg-sky-100 text-sky-800";
+                                    } else {
+                                        style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                    }
+                                }
+
+                                return `<button onclick="handleAnswer('${opt.replace(/'/g, "\\'")}')" 
+                                            class="p-5 text-left border-2 rounded-xl font-bold transition-all ${style}">
+                                            ${opt}
+                                        </button>`;
+                            }).join('')}
+                        </div>
+
+                        ${multi && state.isAnswerCorrect === null ? `
+                            <button onclick="checkMultiAnswer()" 
+                                class="mt-6 w-full py-4 rounded-xl font-bold transition-all
+                                ${selected.length === q.maxSelect 
+                                    ? 'bg-sky-600 text-white hover:bg-sky-700' 
+                                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'}"
+                                ${selected.length !== q.maxSelect ? 'disabled' : ''}>
+                                Comprobar respuesta (${selected.length}/${q.maxSelect})
+                            </button>
+                        ` : ''}
+
+                        ${state.selectedAnswer !== null && state.isAnswerCorrect === false ? `
+                            <div class="mt-6 p-5 bg-amber-50 border border-amber-200 rounded-xl">
+                                <p class="font-bold text-amber-800 mb-2">Explicación:</p>
+                                <p class="text-slate-700">${q.explanation}</p>
+                            </div>
+                            <button onclick="nextQuestion()" class="mt-6 w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all">
+                                Siguiente pregunta
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>`;
+            }
+
+            if (state.view === 'results') {
+                const scorePerc = Math.round((state.score / state.activeQuestions.length) * 100);
+                app.innerHTML = `
+                <div class="max-w-md mx-auto text-center animate-fade-in bg-white p-12 rounded-[3rem] shadow-2xl">
+                    <h2 class="text-2xl font-black mb-2">${state.studentName}</h2>
+                    <p class="text-slate-400 uppercase text-xs font-bold mb-6">${state.currentMode}</p>
+                    <div class="text-7xl font-black text-emerald-600 mb-4">${scorePerc}%</div>
+                    <p class="text-lg font-bold text-slate-700 mb-10">${state.score} / ${state.activeQuestions.length} correctas</p>
+                    <button onclick="location.reload()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold">VOLVER AL INICIO</button>
+                    <p class="mt-6 text-xs font-bold text-slate-400">
+                        ${state.emailStatus === 'success' ? '✅ Nota e imagen enviadas al correo' :
+                          state.emailStatus === 'error' ? '⚠️ Error al enviar nota e imagen' :
+                          '⏳ Enviando nota e imagen al correo...'}
+                    </p>
+                </div>`;
+            }
+        }
+        render();
+    </script>
+</body>
+</html>
